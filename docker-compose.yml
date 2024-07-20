@@ -1,16 +1,9 @@
 version: '3.9'
 
 services:
-  booking-core-discovery:
-    container_name: 'booking-core-discovery'
-    build: .
-    ports:
-      - 8761:8761
-    networks:
-      - booking-core
-  booking-core_zookeeper:
+  aima-core_zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: booking-core_zookeeper
+    container_name: aima-core_zookeeper
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -18,28 +11,34 @@ services:
     ports:
       - "2181:2181"
     networks:
-      - booking-core
-  booking-core_kafka:
+      - local-net
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+  aima-core_kafka:
     image: confluentinc/cp-kafka:latest
-    container_name: booking-core_kafka
+    container_name: aima-core_kafka
     ports:
       - "9092:9092"
     networks:
-      - booking-core
+      - local-net
     depends_on:
-      - booking-core_zookeeper
+      - aima-core_zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_ZOOKEEPER_CONNECT: booking-core_zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: aima-core_zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_LISTENERS: CLIENT://:9092,EXTERNAL://:9093
-      KAFKA_ADVERTISED_LISTENERS: CLIENT://booking-core_kafka:9092,EXTERNAL://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: CLIENT://aima-core_kafka:9092,EXTERNAL://localhost:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: CLIENT
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+volumes:
+  kafka-data:
 networks:
-  booking-core:
-    name: booking-core
+  local-net:
+    name: local-net
     driver: bridge
