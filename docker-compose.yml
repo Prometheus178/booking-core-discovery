@@ -36,6 +36,13 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: CLIENT
     volumes:
       - kafka-data:/var/lib/kafka/data
+  topic-init:
+    image: bitnami/kafka:latest
+    volumes:
+      - ./create-topics.sh:/create-topics.sh
+    depends_on:
+      - kafka
+    entrypoint: [ "/bin/bash", "/create-topics.sh" ]
 volumes:
   kafka-data:
 networks:
