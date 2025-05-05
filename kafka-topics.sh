@@ -24,6 +24,7 @@ TOPICS=(
   "analytics-create-user"
   "analytics-user-reservation-history"
   "spot-create-event"
+  "pre-listing-place-event"
 )
 
 for topic in "${TOPICS[@]}"; do
